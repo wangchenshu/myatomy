@@ -28,15 +28,6 @@ public class LineBotProductsController {
     public List<Object> handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
         String eventStr = event.getMessage().getText();
         AtomicReference<String> retStr = new AtomicReference<>("只要輸入 艾多美新品名稱");
-
-        productsService.findByNameContaining(eventStr).ifPresent(products -> {
-            retStr.set(
-                    "名稱: " + products.getName() + "\n" +
-                    "價格: " + products.getPrice() + "\n" +
-                    "PV: " + products.getPoint()
-            );
-        });
-
         List<Object> list = new ArrayList<>();
         list.add(
                 new TemplateMessage(retStr.get(), new ButtonsTemplate(
@@ -50,7 +41,32 @@ public class LineBotProductsController {
                                 new MessageAction("新春紅包袋", "艾多美 新春紅包袋")
                         )))
         );
-        list.add(new TextMessage(retStr.get()));
+
+        List<String> stringList = new ArrayList<>();
+
+        productsService.findByNameContaining(eventStr)
+                .forEach(products -> {
+                    stringList.add(
+                            "名稱: " + products.getName() + "\n" +
+                                    "價格: " + products.getPrice() + "\n" +
+                                    "PV: " + products.getPoint()
+                    );
+                });
+//        productsService.findByNameContaining(eventStr).ifPresent(products -> {
+//            retStr.set(
+//                    "名稱: " + products.getName() + "\n" +
+//                    "價格: " + products.getPrice() + "\n" +
+//                    "PV: " + products.getPoint()
+//            );
+//        });
+
+        int strLen = stringList.size();
+        if (strLen > 4) {
+            strLen = 4;
+        }
+        stringList.subList(0, strLen).forEach(item -> {
+            list.add(new TextMessage(item));
+        });
 
         return list;
     }

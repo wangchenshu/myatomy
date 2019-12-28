@@ -26,7 +26,7 @@ public class ProductsService {
         return productsRepository.findByName(name);
     }
 
-    public Optional<Products> findByNameContaining(String name) {
+    public List<Products> findByNameContaining(String name) {
         return productsRepository.findByNameContaining(name);
     }
 }
